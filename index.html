@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
+        <script src="app.js"></script>
+        <title>Salesforce Data Setuper</title>
+        <link rel="stylesheet" href="app.css">
+    </head>
+
+    <body>
+        <div id="wrapper">
+            <div class="card" id="login">
+                <div class="card-title">Login to Salesforce</div>
+                <div class="login-form">
+                    <div class="title">Username</div>
+                    <input type="text" id="salesforce-username">
+                    <div class="title">Password</div>
+                    <input type="password" id="salesforce-password">
+                    <div class="title">Security token (optional)</div>
+                    <input type="password" id="salesforce-token">
+                    <div class="button blue" onclick="login()">Log in</div>
+                </div>
+            </div>
+            <div class="card" id="buttons">
+                <div class="card-title">Action Presets</div>
+                <span class="button red" onclick="recursiveDelete('Account')">Delete All Accounts</span>
+                <span class="button red" onclick="recursiveDelete('Contact')">Delete All Contacts</span>
+                <span class="button red" onclick="recursiveDelete('Lead')">Delete All Leads</span>
+                <span class="button red" onclick="recursiveDelete('Opportunity')">Delete All Opportunities</span>
+            </div>
+            <div class="card" id="create-buttons">
+                <div class="card-title">Create records Presets</div>
+                <div class="item">
+                    <span class="button green" onclick="recordsCreator.createContacts(document.getElementById('create-contacts-count').value)">Create Contacts</span>
+                    <input type="text" id="create-contacts-count" value="1">
+                </div>
+                <div class="item">
+                    <span class="button green" onclick="recordsCreator.createAccounts(document.getElementById('create-accounts-count').value)">Create Accounts</span>
+                    <input type="text" id="create-accounts-count" value="1">
+                </div>
+                <div class="item">
+                    <span class="button green" onclick="recordsCreator.createLeads(document.getElementById('create-leads-count').value)">Create Leads</span>
+                    <input type="text" id="create-leads-count" value="1">
+                </div>
+            </div>
+            <div class="card" id="log">
+                <div class="card-title">Debug Log</div>
+                <div id="log-container">
+                    <div id="log-item-template">
+                        <span class="log-item-date"></span>
+                        <span class="log-item-level"></span>
+                        <span class="log-item-text"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>
