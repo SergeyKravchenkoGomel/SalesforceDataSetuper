@@ -114,11 +114,13 @@ var sf = {
         }
     },
     utils: {
-        recursiveDelete: function(objectApiName) {
+        recursiveDelete: function(objectApiName, removeAfter) {
             var itemsToDelete = [];
 
-            var searchDeep = function(objectApiName, parentIds, parentField) {
+            var searchDeep = function(objectApiName, parentIds, parentField, removeAfter) {
                 var query = 'SELECT Id FROM ' + objectApiName;
+                if (removeAfter !== undefined && removeAfter !== null && removeAfter !== '')
+                    query += ' WHERE CreatedDate >= ' + removeAfter;
 
                 // if (parentIds !== null && parentIds !== undefined) {
                 //     query += ' WHERE ' + parentField + ' IN (';
@@ -169,7 +171,7 @@ var sf = {
                 }, false);
             };
 
-            searchDeep(objectApiName);
+            searchDeep(objectApiName, null, null, removeAfter);
 
             var reversedProps = [];
             for (var propName in itemsToDelete) {
@@ -284,13 +286,15 @@ var dom = {
 };
 
 var recordsCreator = {
-    createContacts: function(count) {
+    createContacts: function(count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
         }
 
-        var maxDuplicateCount = Math.round(count * 0.5);
+        var maxDuplicateCount = 0;
+        if (createDuplicates)
+            maxDuplicateCount = Math.round(count * 0.5);
         count -= maxDuplicateCount;
 
         var currentDuplicateCount = 0;
@@ -388,7 +392,7 @@ var recordsCreator = {
             }
         });
     },
-    createAccounts: function(count) {
+    createAccounts: function(count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
@@ -396,7 +400,9 @@ var recordsCreator = {
 
         dom.log.info('Getting companies names examples');
 
-        var maxDuplicateCount = Math.round(count * 0.5);
+        var maxDuplicateCount = 0;
+        if (createDuplicates)
+            maxDuplicateCount = Math.round(count * 0.5);
         count -= maxDuplicateCount;
         var currentDuplicateCount = 0;
 
@@ -477,13 +483,15 @@ var recordsCreator = {
             }
         });
     },
-    createLeads: function(count) {
+    createLeads: function(count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
         }
 
-        var maxDuplicateCount = Math.round(count * 0.5);
+        var maxDuplicateCount = 0;
+        if (createDuplicates)
+            maxDuplicateCount = Math.round(count * 0.5);
         count -= maxDuplicateCount;
         var currentDuplicateCount = 0;
 
@@ -631,11 +639,15 @@ function login() {
     });
 }
 
-function recursiveDelete(apiName) {
+function recursiveDelete(apiName, removeAfter) {
+
+    if (removeAfter != '')
+        removeAfter += ':00Z';
+
     if (!sf.connection.isLoggedIn) {
         dom.log.error('You must be logged in');
         return;
     }
 
-    sf.utils.recursiveDelete(apiName);
+    sf.utils.recursiveDelete(apiName, removeAfter);
 }

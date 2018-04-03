@@ -9,48 +9,117 @@
     </head>
 
     <body>
+        <div class="card">
+            <div id="page-name">Salesforce Test Data Factory</div>
+        </div>
         <div id="wrapper">
-            <div class="card" id="login">
-                <div class="card-title">Login to Salesforce</div>
-                <div class="login-form">
-                    <div class="title">Username</div>
-                    <input type="text" id="salesforce-username">
-                    <div class="title">Password</div>
-                    <input type="password" id="salesforce-password">
-                    <div class="title">Security token (optional)</div>
-                    <input type="password" id="salesforce-token">
-                    <div class="button blue" onclick="login()">Log in</div>
+            <div class="flex flex-justify-between">
+                <div class="flex flex-direction-column">
+                    <div class="card card-login">
+                        <div class="card-title">Login into Salesforce</div>
+                        <div class="flex flex-justify-center">
+                            <div>
+                                <div class="label">Username</div>
+                                <input type="text" id="salesforce-username"/>
+                                <div class="label">Password</div>
+                                <input type="password" id="salesforce-password">
+                                <div class="label">Security token <span class="hint">(optional)</span></div>
+                                <input type="text" id="salesforce-token">
+                                <div class="button blue" onclick="login()">Log in</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-log">
+                        <div class="card-title">Debug Log</div>
+                        <div id="log-container">
+                            <div id="log-item-template">
+                                <span class="log-item-date"></span>
+                                <span class="log-item-level"></span>
+                                <span class="log-item-text"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card" id="buttons">
-                <div class="card-title">Action Presets</div>
-                <span class="button red" onclick="recursiveDelete('Account')">Delete All Accounts</span>
-                <span class="button red" onclick="recursiveDelete('Contact')">Delete All Contacts</span>
-                <span class="button red" onclick="recursiveDelete('Lead')">Delete All Leads</span>
-                <span class="button red" onclick="recursiveDelete('Opportunity')">Delete All Opportunities</span>
-            </div>
-            <div class="card" id="create-buttons">
-                <div class="card-title">Create records Presets</div>
-                <div class="item">
-                    <span class="button green" onclick="recordsCreator.createContacts(document.getElementById('create-contacts-count').value)">Create Contacts</span>
-                    <input type="text" id="create-contacts-count" value="1">
+                <div>
+                    <div class="card mass-removal">
+                        <div class="card-title">Mass records removal</div>
+                        <div class="label">Remove <span class="object-name">Accounts</span></div>
+                        <div class="flex button-container flex-align-center">
+                            <div>
+                                <div class="button red" onclick="recursiveDelete('Account', document.getElementById('accounts-remove-after').value)">Remove Accounts</div>
+                            </div>
+                            <div class="input-container">
+                                <div class="label">Remove after</div>
+                                <input type="datetime-local" id="accounts-remove-after"/>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="label">Remove <span class="object-name">Contacts</span></div>
+                        <div class="flex button-container flex-align-center">
+                            <div>
+                                <div class="button red" onclick="recursiveDelete('Contact', document.getElementById('leads-contacts-after').value)">Remove Contacts</div>
+                            </div>
+                            <div class="input-container">
+                                <div class="label">Remove after</div>
+                                <input type="datetime-local" id="contacts-remove-after"/>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="label">Remove <span class="object-name">Leads</span></div>
+                        <div class="flex button-container flex-align-center">
+                            <div>
+                                <div class="button red" onclick="recursiveDelete('Lead', document.getElementById('leads-remove-after').value)">Remove Leads</div>
+                            </div>
+                            <div class="input-container">
+                                <div class="label">Remove after</div>
+                                <input type="datetime-local" id="leads-remove-after"/>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="label">Remove <span class="object-name">Opportunities</span></div>
+                        <div class="flex button-container flex-align-center">
+                            <div>
+                                <div class="button red" onclick="recursiveDelete('Opportunity', document.getElementById('opportunities-remove-after').value)">Remove Opportunities</div>
+                            </div>
+                            <div class="input-container">
+                                <div class="label">Remove after</div>
+                                <input type="datetime-local" id="opportunities-remove-after"/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="item">
-                    <span class="button green" onclick="recordsCreator.createAccounts(document.getElementById('create-accounts-count').value)">Create Accounts</span>
-                    <input type="text" id="create-accounts-count" value="1">
-                </div>
-                <div class="item">
-                    <span class="button green" onclick="recordsCreator.createLeads(document.getElementById('create-leads-count').value)">Create Leads</span>
-                    <input type="text" id="create-leads-count" value="1">
-                </div>
-            </div>
-            <div class="card" id="log">
-                <div class="card-title">Debug Log</div>
-                <div id="log-container">
-                    <div id="log-item-template">
-                        <span class="log-item-date"></span>
-                        <span class="log-item-level"></span>
-                        <span class="log-item-text"></span>
+                <div>
+                    <div class="card data-factory">
+                        <div class="card-title">Test Data Factory</div>
+                        <div>
+                            <div class="label">Create test <span class="object-name">Accounts</span></div>
+                            <div class="button green" onclick="recordsCreator.createAccounts(document.getElementById('create-accounts-count').value, document.getElementById('test-accounts-duplicate').checked)">Create</div>
+                            <input type="text" value="1" id="create-accounts-count">
+                            <input type="checkbox" id="test-accounts-duplicate">
+                            <label for="test-accounts-duplicate">Create duplicates</label>
+                        </div>
+                        <div class="separator"></div>
+                        <div>
+                            <div class="label">Create test <span class="object-name">Contacts</span></div>
+                            <div class="button green" onclick="recordsCreator.createContacts(document.getElementById('create-contacts-count').value, document.getElementById('test-contacts-duplicate').checked)">Create</div>
+                            <input type="text" value="1" id="create-contacts-count">
+                            <input type="checkbox" id="test-contacts-duplicate">
+                            <label for="test-contacts-duplicate">Create duplicates</label>
+                        </div>
+                        <div class="separator"></div>
+                        <div>
+                            <div class="label">Create test <span class="object-name">Leads</span></div>
+                            <div class="button green" onclick="recordsCreator.createLeads(document.getElementById('create-leads-count').value, document.getElementById('test-leads-duplicate').checked)">Create</div>
+                            <input type="text" value="1" id="create-leads-count">
+                            <input type="checkbox" id="test-leads-duplicate">
+                            <label for="test-leads-duplicate">Create duplicates</label>
+                        </div>
                     </div>
                 </div>
             </div>
