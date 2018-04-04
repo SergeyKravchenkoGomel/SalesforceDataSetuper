@@ -204,6 +204,10 @@ body {
     margin-left: 10px;
 }
 
+.mass-removal select {
+    margin-top: 10px;
+}
+
 .card .separator {
     margin: 20px 0;
     background: #16325c;

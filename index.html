@@ -4,7 +4,7 @@
     <head>
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
         <script src="app.js"></script>
-        <title>Salesforce Data Setuper</title>
+        <title>Salesforce Test Data Factory</title>
         <link rel="stylesheet" href="app.css">
     </head>
 
@@ -25,6 +25,10 @@
                                 <input type="password" id="salesforce-password">
                                 <div class="label">Security token <span class="hint">(optional)</span></div>
                                 <input type="text" id="salesforce-token">
+                                <div>
+                                    <input type="checkbox" id="remember-me" onchange="changeRememberMe()">
+                                    <label for="remember-me">Remember me</label>
+                                </div>
                                 <div class="button blue" onclick="login()">Log in</div>
                             </div>
                         </div>
@@ -90,6 +94,22 @@
                             <div class="input-container">
                                 <div class="label">Remove after</div>
                                 <input type="datetime-local" id="opportunities-remove-after"/>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+                        <div class="label">Remove <span class="object-name">Another SObject</span></div>
+                        <div>
+                            <select id="custom-sobject-selector">
+                            </select>
+                        </div>
+                        <div class="flex button-container flex-align-center">
+                            <div>
+                                <div class="button red" onclick="recursiveDelete(document.getElementById('custom-sobject-selector').options[document.getElementById('custom-sobject-selector').selectedIndex].value, document.getElementById('another-sobject-remove-after').value)">Remove SObject Records</div>
+                            </div>
+                            <div class="input-container">
+                                <div class="label">Remove after</div>
+                                <input type="datetime-local" id="another-sobject-remove-after"/>
                             </div>
                         </div>
                     </div>

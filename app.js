@@ -5,7 +5,11 @@ var sf = {
         isLoggedIn: false,
         instanceUrl: null,
         sessionId: null,
-        login: function(username, password, securityToken, onLogin, onError) {
+        login: function (username, password, securityToken, onLogin, onError) {
+            username = username.trim();
+            password = password.trim();
+            securityToken = securityToken.trim();
+
             net.ajax('https://login.salesforce.com/services/Soap/u/42.0', 'POST', '<?xml version="1.0" encoding="utf-8" ?>\n' +
                 '<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"\n' +
                 '    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n' +
@@ -17,26 +21,26 @@ var sf = {
                 '    </n1:login>\n' +
                 '  </env:Body>\n' +
                 '</env:Envelope>', {
-                'Content-type': 'text/xml',
-                'SOAPAction': '\'\''
-            }, function(xhr) {
-                if (xhr.status === 200) {
-                    sf.connection.isLoggedIn = true;
-                    sf.connection.sessionId = helpers.getXMLValue(xhr.responseText, 'sessionId');
+                    'Content-type': 'text/xml',
+                    'SOAPAction': '\'\''
+                }, function (xhr) {
+                    if (xhr.status === 200) {
+                        sf.connection.isLoggedIn = true;
+                        sf.connection.sessionId = helpers.getXMLValue(xhr.responseText, 'sessionId');
 
-                    if (helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.my.salesforce.com/') === null)
-                        sf.connection.instanceUrl = helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.salesforce.com/')[0];
-                    else sf.connection.instanceUrl = helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.my.salesforce.com/')[0];
+                        if (helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.my.salesforce.com/') === null)
+                            sf.connection.instanceUrl = helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.salesforce.com/')[0];
+                        else sf.connection.instanceUrl = helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.my.salesforce.com/')[0];
 
-                    if (onLogin !== null || onLogin !== undefined)
-                        onLogin();
-                } else {
-                    if (onError !== null || onError !== undefined)
-                        onError(helpers.getXMLValue(xhr.responseText, 'faultstring'));
-                }
-            });
+                        if (onLogin !== null || onLogin !== undefined)
+                            onLogin();
+                    } else {
+                        if (onError !== null || onError !== undefined)
+                            onError(helpers.getXMLValue(xhr.responseText, 'faultstring'));
+                    }
+                });
         },
-        ajax: function(url, method, data, headers, callback, async) {
+        ajax: function (url, method, data, headers, callback, async) {
             if (!this.isLoggedIn)
                 return;
 
@@ -50,7 +54,7 @@ var sf = {
         }
     },
     bulk: {
-        doJob: function(options, onSuccess, onError) {
+        doJob: function (options, onSuccess, onError) {
             if (!sf.connection.isLoggedIn) {
                 dom.log.error('You must be logged in');
                 return;
@@ -68,56 +72,56 @@ var sf = {
                 'contentType': options['contentType'],
                 'lineEnding': options['lineEnding']
             }), {
-                'Content-type': 'application/json'
-            }, function(xhr) {
-                if (xhr.status === 200) {
-                    var job = JSON.parse(xhr.responseText);
+                    'Content-type': 'application/json'
+                }, function (xhr) {
+                    if (xhr.status === 200) {
+                        var job = JSON.parse(xhr.responseText);
 
-                    sf.connection.ajax('/services/data/v' + sf.apiVersion + '/jobs/ingest/' + job['id'] + '/batches', 'PUT', options['data'], {
-                        'Content-type': 'text/csv'
-                    }, function(xhr) {
-                        if (xhr.status === 201) {
-                            sf.connection.ajax('/services/data/v' + sf.apiVersion + '/jobs/ingest/' + job['id'], 'PATCH', JSON.stringify({
-                                'state': 'UploadComplete'
-                            }), {
-                                'Content-type': 'application/json'
-                            }, function(xhr) {
-                                if (xhr.status === 200) {
-                                    if (onSuccess !== null && onSuccess !== undefined)
-                                        onSuccess(JSON.parse(xhr.responseText));
-                                } else {
-                                    if (onError !== null && onError !== undefined)
-                                        onError(xhr.responseText);
-                                }
-                            })
-                        } else {
-                            if (onError !== null && onError !== undefined)
-                                onError(xhr.responseText);
-                        }
-                    })
-                } else {
-                    if (onError !== null && onError !== undefined)
-                        onError(xhr.responseText);
-                }
-            })
+                        sf.connection.ajax('/services/data/v' + sf.apiVersion + '/jobs/ingest/' + job['id'] + '/batches', 'PUT', options['data'], {
+                            'Content-type': 'text/csv'
+                        }, function (xhr) {
+                            if (xhr.status === 201) {
+                                sf.connection.ajax('/services/data/v' + sf.apiVersion + '/jobs/ingest/' + job['id'], 'PATCH', JSON.stringify({
+                                    'state': 'UploadComplete'
+                                }), {
+                                        'Content-type': 'application/json'
+                                    }, function (xhr) {
+                                        if (xhr.status === 200) {
+                                            if (onSuccess !== null && onSuccess !== undefined)
+                                                onSuccess(JSON.parse(xhr.responseText));
+                                        } else {
+                                            if (onError !== null && onError !== undefined)
+                                                onError(xhr.responseText);
+                                        }
+                                    })
+                            } else {
+                                if (onError !== null && onError !== undefined)
+                                    onError(xhr.responseText);
+                            }
+                        })
+                    } else {
+                        if (onError !== null && onError !== undefined)
+                            onError(xhr.responseText);
+                    }
+                })
         }
     },
     soql: {
-        query: function(query, callback, async) {
+        query: function (query, callback, async) {
             if (async === null || async === undefined)
                 async = true;
 
-            sf.connection.ajax('/services/data/v' + sf.apiVersion + '/query?q=' + query, 'GET', null, {}, function(xhr) {
+            sf.connection.ajax('/services/data/v' + sf.apiVersion + '/query?q=' + query, 'GET', null, {}, function (xhr) {
                 if (callback !== null && callback !== undefined)
                     callback(JSON.parse(xhr.responseText));
             }, async);
         }
     },
     utils: {
-        recursiveDelete: function(objectApiName, removeAfter) {
+        recursiveDelete: function (objectApiName, removeAfter) {
             var itemsToDelete = [];
 
-            var searchDeep = function(objectApiName, parentIds, parentField, removeAfter) {
+            var searchDeep = function (objectApiName, parentIds, parentField, removeAfter) {
                 var query = 'SELECT Id FROM ' + objectApiName;
                 if (removeAfter !== undefined && removeAfter !== null && removeAfter !== '')
                     query += ' WHERE CreatedDate >= ' + removeAfter;
@@ -133,7 +137,7 @@ var sf = {
                 //     query += ')';
                 // }
 
-                sf.soql.query(query, function(result) {
+                sf.soql.query(query, function (result) {
                     if (result.records.length <= 0)
                         return;
 
@@ -148,15 +152,15 @@ var sf = {
 
                     dom.log.info('Deleting ' + records.length + ' record(s) of ' + objectApiName + ' object');
 
-                    sf.connection.ajax('/services/data/v' + sf.apiVersion + '/sobjects/' + objectApiName + '/describe', 'GET', {}, {}, function(xhr) {
+                    sf.connection.ajax('/services/data/v' + sf.apiVersion + '/sobjects/' + objectApiName + '/describe', 'GET', {}, {}, function (xhr) {
                         if (xhr.status === 200) {
                             var result = JSON.parse(xhr.responseText);
 
-                            helpers.forEach(result['childRelationships'], function(item) {
+                            helpers.forEach(result['childRelationships'], function (item) {
                                 if (item['restrictedDelete']) {
                                     var parentIds = [];
 
-                                    helpers.forEach(records, function(item) {
+                                    helpers.forEach(records, function (item) {
                                         parentIds.push(item['Id']);
                                     });
 
@@ -184,24 +188,24 @@ var sf = {
             }
 
             var index = 0;
-            var createBulk = function() {
+            var createBulk = function () {
                 var objectName = reversedProps[index];
                 var objectIds = itemsToDelete[objectName];
 
                 var data = '"Id"';
-                helpers.forEach(objectIds, function(item) {
+                helpers.forEach(objectIds, function (item) {
                     data += '\r\n"' + item + '"';
                 });
 
                 var options = {
-                    'operation' : 'delete',
-                    'object' : objectName,
-                    'contentType' : 'CSV',
+                    'operation': 'delete',
+                    'object': objectName,
+                    'contentType': 'CSV',
                     'lineEnding': 'CRLF',
-                    'data' : data
+                    'data': data
                 };
 
-                var onSuccess = function() {
+                var onSuccess = function () {
                     index++;
                     if (index < reversedProps.length)
                         createBulk();
@@ -216,12 +220,34 @@ var sf = {
                 } else sf.bulk.doJob(options, onSuccess);
             };
             createBulk();
+        },
+        getSObjects: function(callback) {
+            sf.connection.ajax('/services/data/v20.0/sobjects/', 'GET', {}, {}, function(xhr) {
+                var result = null;
+
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    result = [];
+
+                    for (var i = 0; i < data['sobjects'].length; i++) {
+                        if (data['sobjects'][i]['layoutable']) {
+                            result.push(data['sobjects'][i]);
+                        }
+                    }
+
+                } else {
+                    dom.log.error('Unknown net error');
+                }
+
+                if (callback !== null && callback !== undefined)
+                    callback(result);
+            });
         }
     }
 };
 
 var net = {
-    ajax: function(url, method, data, headers, callback, async) {
+    ajax: function (url, method, data, headers, callback, async) {
         var xhr = new XMLHttpRequest();
 
         if (async === null || async === undefined)
@@ -232,7 +258,7 @@ var net = {
             xhr.setRequestHeader(property, headers[property]);
         }
 
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 callback(xhr);
             }
@@ -242,10 +268,10 @@ var net = {
 };
 
 var helpers = {
-    getXMLValue: function(input, tag) {
+    getXMLValue: function (input, tag) {
         return input.match('<' + tag + '>(.*)</' + tag + '>')[1];
     },
-    forEach: function(array, callback) {
+    forEach: function (array, callback) {
         for (property in array) {
             callback(array[property]);
         }
@@ -268,25 +294,25 @@ var dom = {
 
             container.appendChild(newItem);
 
-            console.log(text);
+            console.log('Debug Log (' + logLevel + '): ' + text);
         },
-        debug: function(text) {
+        debug: function (text) {
             dom.log.showMessage(text, 'debug');
         },
-        info: function(text) {
+        info: function (text) {
             dom.log.showMessage(text, 'info');
         },
-        error: function(text) {
+        error: function (text) {
             dom.log.showMessage(text, 'error');
         },
-        success: function(text) {
+        success: function (text) {
             dom.log.showMessage(text, 'success');
         }
     }
 };
 
 var recordsCreator = {
-    createContacts: function(count, createDuplicates) {
+    createContacts: function (count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
@@ -302,7 +328,7 @@ var recordsCreator = {
         dom.log.info('Getting Name examples');
 
         var namesPage = Math.round(Math.random() * 12) + 1;
-        net.ajax('https://www.behindthename.com/names/usage/english/' + namesPage, 'GET', {}, {}, function(xhr) {
+        net.ajax('https://www.behindthename.com/names/usage/english/' + namesPage, 'GET', {}, {}, function (xhr) {
             if (xhr.status === 200) {
                 var html = document.createElement('html');
                 html.innerHTML = xhr.responseText;
@@ -311,7 +337,7 @@ var recordsCreator = {
 
                 dom.log.info('Getting Surnames examples');
 
-                net.ajax('https://www.houseofnames.com/top-surnames.html', 'GET', {}, {}, function(xhr) {
+                net.ajax('https://www.houseofnames.com/top-surnames.html', 'GET', {}, {}, function (xhr) {
                     if (xhr.status === 200) {
                         var html = document.createElement('html');
                         html.innerHTML = xhr.responseText;
@@ -378,9 +404,9 @@ var recordsCreator = {
                             'lineEnding': 'CRLF',
                             'data': csvData
                         }
-                        sf.bulk.doJob(options, function() {
+                        sf.bulk.doJob(options, function () {
                             dom.log.success('Bulk job queued. Check for new Contacts');
-                        }, function() {
+                        }, function () {
                             dom.log.error('Unknown Bulk error! Please, try again');
                         })
                     } else {
@@ -392,7 +418,7 @@ var recordsCreator = {
             }
         });
     },
-    createAccounts: function(count, createDuplicates) {
+    createAccounts: function (count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
@@ -406,7 +432,7 @@ var recordsCreator = {
         count -= maxDuplicateCount;
         var currentDuplicateCount = 0;
 
-        net.ajax('https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States', 'GET', {}, {}, function(xhr) {
+        net.ajax('https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States', 'GET', {}, {}, function (xhr) {
             if (xhr.status === 200 || xhr.status === 304) {
                 var html = document.createElement('html');
                 html.innerHTML = xhr.responseText;
@@ -428,7 +454,7 @@ var recordsCreator = {
                     var csvLine = '\r\n"' + accountName + '",';
                     csvLine += '"' + website + '",';
                     csvLine += '"' + phoneNumber + '"';
-                    
+
                     csvData += csvLine;
 
                     if (Math.random() > 0.2 && currentDuplicateCount < maxDuplicateCount) {
@@ -473,17 +499,17 @@ var recordsCreator = {
                     'data': csvData
                 };
 
-                 sf.bulk.doJob(options, function() {
-                     dom.log.success('Bulk job queued. Check for new Accounts');
-                 }, function() {
-                     dom.log.error('Unknown Bulk error. Please, try again');
-                 });
+                sf.bulk.doJob(options, function () {
+                    dom.log.success('Bulk job queued. Check for new Accounts');
+                }, function () {
+                    dom.log.error('Unknown Bulk error. Please, try again');
+                });
             } else {
                 dom.log.error('Unknown net error');
             }
         });
     },
-    createLeads: function(count, createDuplicates) {
+    createLeads: function (count, createDuplicates) {
         if (Number.isNaN(parseInt(count))) {
             dom.log.error('Count is not a number');
             return;
@@ -498,7 +524,7 @@ var recordsCreator = {
         dom.log.info('Getting names examples');
 
         var namesPage = Math.round(Math.random() * 12) + 1;
-        net.ajax('https://www.behindthename.com/names/usage/english/' + namesPage, 'GET', {}, {}, function(xhr) {
+        net.ajax('https://www.behindthename.com/names/usage/english/' + namesPage, 'GET', {}, {}, function (xhr) {
             if (xhr.status === 200) {
                 var html = document.createElement('html');
                 html.innerHTML = xhr.responseText;
@@ -507,7 +533,7 @@ var recordsCreator = {
 
                 dom.log.info('Getting Surnames examples');
 
-                net.ajax('https://www.houseofnames.com/top-surnames.html', 'GET', {}, {}, function(xhr) {
+                net.ajax('https://www.houseofnames.com/top-surnames.html', 'GET', {}, {}, function (xhr) {
                     if (xhr.status === 200) {
                         var html = document.createElement('html');
                         html.innerHTML = xhr.responseText;
@@ -516,11 +542,11 @@ var recordsCreator = {
 
                         dom.log.info('Getting companies names examples');
 
-                        net.ajax('https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States', 'GET', {}, {}, function(xhr) {
+                        net.ajax('https://en.wikipedia.org/wiki/List_of_companies_of_the_United_States', 'GET', {}, {}, function (xhr) {
                             if (xhr.status === 200 || xhr.status === 304) {
                                 var html = document.createElement('html');
                                 html.innerHTML = xhr.responseText;
-                
+
                                 var companies = html.querySelectorAll('div.columns.column-count > ul > li > a');
 
                                 dom.log.info('Generating Leads records');
@@ -592,12 +618,12 @@ var recordsCreator = {
                                     'object': 'Lead',
                                     'contentType': 'CSV',
                                     'lineEnding': 'CRLF',
-                                    'data' : csvData
-                                 };
+                                    'data': csvData
+                                };
 
-                                sf.bulk.doJob(options, function() {
+                                sf.bulk.doJob(options, function () {
                                     dom.log.success('Bulk job queued. Check for new Leads');
-                                }, function() {
+                                }, function () {
                                     dom.log.error('Unknown Bulk error. Please, try again');
                                 });
                             } else {
@@ -605,8 +631,8 @@ var recordsCreator = {
                             }
                         });
                     } else {
-                dom.log.error('Unknown net error');
-                dom.log.error('Unhandled network error');
+                        dom.log.error('Unknown net error');
+                        dom.log.error('Unhandled network error');
                     }
                 });
             } else {
@@ -617,6 +643,14 @@ var recordsCreator = {
 }
 
 window.addEventListener('load', function () {
+
+    if (window.localStorage.getItem('sf-username') !== null && window.localStorage.getItem('sf-username') !== undefined) {
+        document.getElementById('salesforce-username').value = window.localStorage.getItem('sf-username');
+        document.getElementById('salesforce-password').value = window.localStorage.getItem('sf-password');
+
+        document.getElementById('remember-me').checked = true;
+    }
+
     dom.log.info('App Initialized');
 });
 
@@ -632,9 +666,31 @@ function login() {
     }
 
     dom.log.info('Connecting to Salesforce');
-    sf.connection.login(document.getElementById('salesforce-username').value, document.getElementById('salesforce-password').value, document.getElementById('salesforce-token').value, function() {
+    sf.connection.login(document.getElementById('salesforce-username').value, document.getElementById('salesforce-password').value, document.getElementById('salesforce-token').value, function () {
         dom.log.success('Successfully logged in Salesforce');
-    }, function(error) {
+
+        if (document.getElementById('remember-me').checked) {
+            window.localStorage.setItem('sf-username', document.getElementById('salesforce-username').value);
+            window.localStorage.setItem('sf-password', document.getElementById('salesforce-password').value);
+        }
+
+        sf.utils.getSObjects(function(sobjects) {
+            if (sobjects === null)
+                return;
+
+            var select = document.getElementById('custom-sobject-selector');
+            select.innerHTML = '';
+
+            for (var i = 0; i < sobjects.length; i++) {
+                var option = document.createElement('option');
+                option.value = sobjects[i]['name'];
+                option.innerHTML = sobjects[i]['label'];
+                if (sobjects[i]['custom'])
+                    option.innerHTML += ' (' + sobjects[i]['name'] + ')';
+                select.appendChild(option);
+            }
+        });
+    }, function (error) {
         dom.log.error(error);
     });
 }
@@ -650,4 +706,11 @@ function recursiveDelete(apiName, removeAfter) {
     }
 
     sf.utils.recursiveDelete(apiName, removeAfter);
+}
+
+function changeRememberMe() {
+    if (!document.getElementById('remember-me').checked) {
+        window.localStorage.removeItem('sf-username');
+        window.localStorage.removeItem('sf-password');
+    }
 }
