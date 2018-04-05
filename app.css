@@ -21,6 +21,10 @@
     align-items: center;
 }
 
+.flex-align-stretch {
+    align-items: stretch;
+}
+
 .button {
     text-align: center;
     position: relative;
@@ -217,4 +221,45 @@ body {
 
 .data-factory .button {
     margin: 15px 0;
+}
+
+.org-info {
+    margin: 0;
+    margin-left: 20px;
+}
+
+.org-info ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.org-info ul li {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.org-info ul li .value {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-align: right;
+    width: auto;
+    border-radius: 0;
+    margin-left: 20px;
+    cursor: pointer;
+    font-style: italic;
+}
+
+.org-info ul li .value:hover {
+    text-decoration: underline;
+}
+
+.org-info .hint {
+    margin-top: 10px;
+    font-size: 10px;
+    font-style: italic;
+    opacity: 0.5;
 }

@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
         <script src="app.js"></script>
         <title>Salesforce Test Data Factory</title>
         <link rel="stylesheet" href="app.css">
@@ -17,7 +17,7 @@
                 <div class="flex flex-direction-column">
                     <div class="card card-login">
                         <div class="card-title">Login into Salesforce</div>
-                        <div class="flex flex-justify-center">
+                        <div class="flex flex-justify-center flex-align-stretch">
                             <div>
                                 <div class="label">Username</div>
                                 <input type="text" id="salesforce-username"/>
@@ -30,6 +30,36 @@
                                     <label for="remember-me">Remember me</label>
                                 </div>
                                 <div class="button blue" onclick="login()">Log in</div>
+                            </div>
+                            <div class="org-info card">
+                                <div class="card-title">Org Info</div>
+                                <ul>
+                                    <li class="flex flex-justify-between">
+                                        <div>Org Name:</div>
+                                        <input type="text" class="value" data-param="organizationName" value="null" readonly/>
+                                    </li>
+                                    <li class="flex flex-justify-between">
+                                        <div>User Name:</div>
+                                        <input type="text" class="value" data-param="userFullName" value="null" readonly/>
+                                    </li>
+                                    <li class="flex flex-justify-between">
+                                        <div>Session Id:</div>
+                                        <input type="text" class="value" data-param="sessionId" value="null" readonly/>
+                                    </li>
+                                    <li class="flex flex-justify-between">
+                                        <div>Org ID:</div>
+                                        <input type="text" class="value" data-param="orgId" value="null" readonly/>
+                                    </li>
+                                    <li class="flex flex-justify-between">
+                                        <div>Profie ID:</div>
+                                        <input type="text" class="value" data-param="profileId" value="null" readonly/>
+                                    </li>
+                                    <li class="flex flex-justify-between">
+                                        <div>Time Zone:</div>
+                                        <input type="text" class="value" data-param="userTimeZone" value="null" readonly/>
+                                    </li>
+                                </ul>
+                                <div class="hint">Click on value to copy to clipboard</div>
                             </div>
                         </div>
                     </div>

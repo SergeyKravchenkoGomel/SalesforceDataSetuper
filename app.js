@@ -33,7 +33,7 @@ var sf = {
                         else sf.connection.instanceUrl = helpers.getXMLValue(xhr.responseText, 'serverUrl').match('https://.*.my.salesforce.com/')[0];
 
                         if (onLogin !== null || onLogin !== undefined)
-                            onLogin();
+                            onLogin(xhr.responseText);
                     } else {
                         if (onError !== null || onError !== undefined)
                             onError(helpers.getXMLValue(xhr.responseText, 'faultstring'));
@@ -666,13 +666,45 @@ function login() {
     }
 
     dom.log.info('Connecting to Salesforce');
-    sf.connection.login(document.getElementById('salesforce-username').value, document.getElementById('salesforce-password').value, document.getElementById('salesforce-token').value, function () {
+    sf.connection.login(document.getElementById('salesforce-username').value, document.getElementById('salesforce-password').value, document.getElementById('salesforce-token').value, function (userInfo) {
         dom.log.success('Successfully logged in Salesforce');
 
         if (document.getElementById('remember-me').checked) {
             window.localStorage.setItem('sf-username', document.getElementById('salesforce-username').value);
             window.localStorage.setItem('sf-password', document.getElementById('salesforce-password').value);
         }
+
+        console.log(userInfo);
+
+        (function() {
+            document.querySelector('.org-info .value[data-param="organizationName"]').title = helpers.getXMLValue(userInfo, 'organizationName');
+            document.querySelector('.org-info .value[data-param="userFullName"]').title = helpers.getXMLValue(userInfo, 'userFullName');
+            document.querySelector('.org-info .value[data-param="sessionId"]').title = helpers.getXMLValue(userInfo, 'sessionId');
+            document.querySelector('.org-info .value[data-param="orgId"]').title = helpers.getXMLValue(userInfo, 'organizationId');
+            document.querySelector('.org-info .value[data-param="profileId"]').title = helpers.getXMLValue(userInfo, 'profileId');
+            document.querySelector('.org-info .value[data-param="userTimeZone"]').title = helpers.getXMLValue(userInfo, 'userTimeZone');
+
+            var divs = document.querySelectorAll('.org-info .value');
+            for (var i = 0; i < divs.length; i++) {
+                divs[i].value = divs[i].title;
+                divs[i].addEventListener('click', function(event) {
+                    var value = event.target.value;
+                    event.target.value = event.target.title;
+                    event.target.select();
+                    document.execCommand("copy");
+                    
+                    event.target.value = '';
+                    event.target.select();
+                    event.target.value = value;
+
+                    dom.log.info(event.target.title + ' Copied to Clipboard');
+
+                    event.target.blur();
+                });
+            }
+
+            document.querySelector('.org-info .value[data-param="sessionId"]').value = helpers.getXMLValue(userInfo, 'sessionId').substring(0, 10);
+        })();
 
         sf.utils.getSObjects(function(sobjects) {
             if (sobjects === null)
